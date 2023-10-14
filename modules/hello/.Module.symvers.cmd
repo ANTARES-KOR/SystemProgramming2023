@@ -1,1 +1,0 @@
-cmd_/home/antares/Documents/modules/hello/Module.symvers :=  scripts/mod/modpost -m -a     -o /home/antares/Documents/modules/hello/Module.symvers -T /home/antares/Documents/modules/hello/modules.order -i Module.symvers -e 
