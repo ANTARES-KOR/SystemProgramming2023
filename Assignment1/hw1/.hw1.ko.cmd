@@ -1,0 +1,1 @@
+cmd_/home/antares/Documents/modules/hw1/hw1.ko := ld -r -EL  -maarch64elf -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/antares/Documents/modules/hw1/hw1.ko /home/antares/Documents/modules/hw1/hw1.o /home/antares/Documents/modules/hw1/hw1.mod.o;  true

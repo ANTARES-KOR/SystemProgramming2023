@@ -1,0 +1,144 @@
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 853d08f75..721452192 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -312,6 +312,27 @@ extern void io_schedule_finish(int token);
+ extern long io_schedule_timeout(long timeout);
+ extern void io_schedule(void);
+ 
++
++// hw1
++
++// struct to store the task information of the previous and next task
++struct hw1_task_info {
++	char task_name[TASK_COMM_LEN];
++	pid_t pid;
++	int prio;
++	unsigned long creat_time;
++	char sched_type[10];
++};
++
++// struct to store the schedule information of the previous and next task
++struct hw1_schedule_info {
++	int cpu;
++	struct hw1_task_info prev;
++	struct hw1_task_info next;
++};
++// hw1
++
++
+ /**
+  * struct prev_cputime - snapshot of system and user cputime
+  * @utime: time spent in user mode
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index 2a4918a1f..df57d88b6 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -48,6 +48,13 @@
+ #include <linux/kcov.h>
+ #include <linux/kprobes.h>
+ #include <linux/llist_api.h>
++
++// hw1
++// loads module.h header to use EXPORT_SYMBOL macro
++// EXPORT_SYMBOL makes the function or variable available to other modules
++#include <linux/module.h>
++// hw1
++
+ #include <linux/mmu_context.h>
+ #include <linux/mmzone.h>
+ #include <linux/mutex_api.h>
+@@ -6448,6 +6455,40 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
+ # define SM_MASK_PREEMPT	SM_PREEMPT
+ #endif
+ 
++// hw1
++
++/*
++* Function to get Scheduler type of the task.
++* 
++* Uses the sched_class of the task to determine the scheduler type.
++*/
++const char *hw1_get_scheduler_type(struct task_struct *task) {
++	if(task->sched_class == &fair_sched_class) {
++		return "CFS";
++	} else if(task->sched_class == &idle_sched_class) {
++		return "IDLE";
++	} else if(task->sched_class == &rt_sched_class) {
++		return "RT";
++	} else if(task->sched_class == &dl_sched_class) {
++		return "DL";
++	} else {
++		return "Unknown";
++	}
++}
++
++
++// Global variables to store the recent scheduling informations.
++struct hw1_schedule_info hw1_recent_schedules[20];
++// Index of the next slot in the array to store the scheduling information.
++int hw1_recent_schedules_index = 0;
++
++// Export the global variables to be used by other modules.
++EXPORT_SYMBOL(hw1_recent_schedules);
++EXPORT_SYMBOL(hw1_recent_schedules_index);
++
++// hw1
++
++
+ /*
+  * __schedule() is the main scheduler function.
+  *
+@@ -6487,6 +6528,8 @@ pick_next_task(struct rq *rq, struct task_struct *prev, struct rq_flags *rf)
+  *
+  * WARNING: must be called with preemption disabled!
+  */
++
++
+ static void __sched notrace __schedule(unsigned int sched_mode)
+ {
+ 	struct task_struct *prev, *next;
+@@ -6496,6 +6539,7 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 	struct rq *rq;
+ 	int cpu;
+ 
++
+ 	cpu = smp_processor_id();
+ 	rq = cpu_rq(cpu);
+ 	prev = rq->curr;
+@@ -6573,6 +6617,35 @@ static void __sched notrace __schedule(unsigned int sched_mode)
+ 	next = pick_next_task(rq, prev, &rf);
+ 	clear_tsk_need_resched(prev);
+ 	clear_preempt_need_resched();
++
++
++
++	// hw1
++
++	// loads the next slot in the scheduler information array to store current scheduling information
++	struct hw1_schedule_info *sched_info = &hw1_recent_schedules[hw1_recent_schedules_index];
++
++	// loads previous task's information in sched_info->prev
++	sched_info->cpu = cpu;
++	sched_info->prev.pid = prev->pid;
++	sched_info->prev.prio = prev->prio;
++	sched_info->prev.creat_time = prev->start_time/NSEC_PER_MSEC;
++	strncpy(sched_info->prev.task_name, prev->comm, TASK_COMM_LEN);
++	strncpy(sched_info->prev.sched_type, hw1_get_scheduler_type(prev), 10);
++
++	// loads next task's information in sched_info->next
++	sched_info->next.pid = next->pid;
++	sched_info->next.prio = next->prio;
++	sched_info->next.creat_time = next->start_time/NSEC_PER_MSEC;
++	strncpy(sched_info->next.task_name, next->comm, TASK_COMM_LEN);
++	strncpy(sched_info->next.sched_type, hw1_get_scheduler_type(next), 10);
++
++	// increments the index of the next slot in the array to store the scheduling information
++	hw1_recent_schedules_index = (hw1_recent_schedules_index + 1) % 20;
++
++	// hw1
++
++
+ #ifdef CONFIG_SCHED_DEBUG
+ 	rq->last_seen_need_resched_ns = 0;
+ #endif

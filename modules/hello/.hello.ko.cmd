@@ -1,0 +1,1 @@
+cmd_/home/antares/Documents/modules/hello/hello.ko := ld -r -EL  -maarch64elf -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/antares/Documents/modules/hello/hello.ko /home/antares/Documents/modules/hello/hello.o /home/antares/Documents/modules/hello/hello.mod.o;  true

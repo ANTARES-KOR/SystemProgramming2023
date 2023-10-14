@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "linux-kernel",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include",
+                "/usr/src/linux-headers-6.2.0-2017147581+/include",
+                "/usr/src/linux-headers-6.2.0-2017147581+/include/uapi",
+                "/usr/src/linux-headers-6.2.0-2017147581+/include/generated/uapi",
+                "/usr/src/linux-headers-6.2.0-2017147581+/arch/arm64/include",
+                "/usr/src/linux-headers-6.2.0-2017147581+/arch/arm64/include/asm",
+                "/usr/src/linux-headers-6.2.0-2017147581+/arch/arm64/include/generated/uapi/asm"
+
+            ],
+            "forcedInclude": [
+            ],
+            "defines": [
+                "__KERNEL__",
+                "MODULE"
+            ],
+            "compilerPath": "/usr/bin/aarch64-linux-gnu-gcc",
+            "cStandard": "gnu11",
+            "intelliSenseMode": "linux-gcc-arm64"
+        }
+    ],
+    "version": 4
+}
