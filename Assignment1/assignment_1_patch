@@ -52,38 +52,38 @@ index 2a4918a1f..df57d88b6 100644
  # define SM_MASK_PREEMPT	SM_PREEMPT
  #endif
  
-+// hw1
-+
-+/*
-+* Function to get Scheduler type of the task.
-+* 
-+* Uses the sched_class of the task to determine the scheduler type.
-+*/
-+const char *hw1_get_scheduler_type(struct task_struct *task) {
-+	if(task->sched_class == &fair_sched_class) {
-+		return "CFS";
-+	} else if(task->sched_class == &idle_sched_class) {
-+		return "IDLE";
-+	} else if(task->sched_class == &rt_sched_class) {
-+		return "RT";
-+	} else if(task->sched_class == &dl_sched_class) {
-+		return "DL";
-+	} else {
-+		return "Unknown";
-+	}
-+}
-+
-+
-+// Global variables to store the recent scheduling informations.
-+struct hw1_schedule_info hw1_recent_schedules[20];
-+// Index of the next slot in the array to store the scheduling information.
-+int hw1_recent_schedules_index = 0;
-+
-+// Export the global variables to be used by other modules.
-+EXPORT_SYMBOL(hw1_recent_schedules);
-+EXPORT_SYMBOL(hw1_recent_schedules_index);
-+
-+// hw1
+// hw1
+
+/*
+* Function to get Scheduler type of the task.
+* 
+* Uses the sched_class of the task to determine the scheduler type.
+*/
+const char *hw1_get_scheduler_type(struct task_struct *task) {
+	if(task->sched_class == &fair_sched_class) {
+		return "CFS";
+	} else if(task->sched_class == &idle_sched_class) {
+		return "IDLE";
+	} else if(task->sched_class == &rt_sched_class) {
+		return "RT";
+	} else if(task->sched_class == &dl_sched_class) {
+		return "DL";
+	} else {
+		return "Unknown";
+	}
+}
+
+
+// Global variables to store the recent scheduling informations.
+struct hw1_schedule_info hw1_recent_schedules[20];
+// Index of the next slot in the array to store the scheduling information.
+int hw1_recent_schedules_index = 0;
+
+// Export the global variables to be used by other modules.
+EXPORT_SYMBOL(hw1_recent_schedules);
+EXPORT_SYMBOL(hw1_recent_schedules_index);
+
+// hw1
 +
 +
  /*
@@ -113,30 +113,30 @@ index 2a4918a1f..df57d88b6 100644
 +
 +
 +
-+	// hw1
-+
-+	// loads the next slot in the scheduler information array to store current scheduling information
-+	struct hw1_schedule_info *sched_info = &hw1_recent_schedules[hw1_recent_schedules_index];
-+
-+	// loads previous task's information in sched_info->prev
-+	sched_info->cpu = cpu;
-+	sched_info->prev.pid = prev->pid;
-+	sched_info->prev.prio = prev->prio;
-+	sched_info->prev.creat_time = prev->start_time/NSEC_PER_MSEC;
-+	strncpy(sched_info->prev.task_name, prev->comm, TASK_COMM_LEN);
-+	strncpy(sched_info->prev.sched_type, hw1_get_scheduler_type(prev), 10);
-+
-+	// loads next task's information in sched_info->next
-+	sched_info->next.pid = next->pid;
-+	sched_info->next.prio = next->prio;
-+	sched_info->next.creat_time = next->start_time/NSEC_PER_MSEC;
-+	strncpy(sched_info->next.task_name, next->comm, TASK_COMM_LEN);
-+	strncpy(sched_info->next.sched_type, hw1_get_scheduler_type(next), 10);
-+
-+	// increments the index of the next slot in the array to store the scheduling information
-+	hw1_recent_schedules_index = (hw1_recent_schedules_index + 1) % 20;
-+
-+	// hw1
+ 	// hw1
+ 
+ 	// loads the next slot in the scheduler information array to store current scheduling information
+ 	struct hw1_schedule_info *sched_info = &hw1_recent_schedules[hw1_recent_schedules_index];
+ 
+ 	// loads previous task's information in sched_info->prev
+ 	sched_info->cpu = cpu;
+ 	sched_info->prev.pid = prev->pid;
+ 	sched_info->prev.prio = prev->prio;
+ 	sched_info->prev.creat_time = prev->start_time/NSEC_PER_MSEC;
+ 	strncpy(sched_info->prev.task_name, prev->comm, TASK_COMM_LEN);
+ 	strncpy(sched_info->prev.sched_type, hw1_get_scheduler_type(prev), 10);
+ 
+ 	// loads next task's information in sched_info->next
+ 	sched_info->next.pid = next->pid;
+ 	sched_info->next.prio = next->prio;
+ 	sched_info->next.creat_time = next->start_time/NSEC_PER_MSEC;
+ 	strncpy(sched_info->next.task_name, next->comm, TASK_COMM_LEN);
+ 	strncpy(sched_info->next.sched_type, hw1_get_scheduler_type(next), 10);
+ 
+ 	// increments the index of the next slot in the array to store the scheduling information
+ 	hw1_recent_schedules_index = (hw1_recent_schedules_index + 1) % 20;
+ 
+ 	// hw1
 +
 +
  #ifdef CONFIG_SCHED_DEBUG
