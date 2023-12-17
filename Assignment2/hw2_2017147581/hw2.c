@@ -27,6 +27,7 @@ DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
 struct task_info {
     pid_t pid;
     char comm[TASK_COMM_LEN];
+    u64 uptime_ns;
     u64 start_time_ns;
     pgd_t *pgd_base;
     struct {
@@ -45,7 +46,6 @@ static struct task_info task_history[MAX_TASKS];
 static int current_index = 0;
 static int task_count = 0;
 
-
 // Function to add task information to the buffer
 void add_task_to_history(struct task_struct *task) {
     struct task_info *info;
@@ -57,6 +57,8 @@ void add_task_to_history(struct task_struct *task) {
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
     info->start_time_ns = task->start_time;
+    // calculate uptime = time after boot - start time
+    info->uptime_ns = jiffies_to_nsecs(jiffies) - info->start_time_ns;
     info->pgd_base = task->mm->pgd;
 
     long unsigned mm_index = 0;
@@ -147,7 +149,7 @@ void find_latest_task(void) {
 static struct timer_list my_timer;
 void timer_callback(struct timer_list *timer) {
     tasklet_schedule(&my_tasklet);
-    mod_timer(timer, jiffies + INTERVAL * HZ);
+    mod_timer(timer, jiffies + msecs_to_jiffies(INTERVAL * 1000));
 }
 
 // Tasklet handler function
@@ -174,62 +176,63 @@ static int proc_show(struct seq_file *m, void *v) {
     for (i = 0; i < min(task_count, MAX_TASKS); i++) {
         info = &task_history[(current_index + i + max(MAX_TASKS - task_count, 0)) % MAX_TASKS];
         seq_printf(m, "[Trace #%d]\n", i);
+        seq_printf(m, "Uptime (s): %llu\n", info->uptime_ns / 1000000000);
         seq_printf(m, "Command: %s\n", info->comm);
         seq_printf(m, "PID: %d\n", info->pid);
         seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000);
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
         seq_printf(m, "Code Area\n");
-        seq_printf(m, "- start (virtual): %lx\n", info->code.vm_start);
-        seq_printf(m, "- start (PGD): %lx\n", info->code.pgd_start);
-        seq_printf(m, "- start (PUD): %lx\n", info->code.pud_start);
-        seq_printf(m, "- start (PMD): %lx\n", info->code.pmd_start);
-        seq_printf(m, "- start (PTE): %lx\n", info->code.pte_start);
-        seq_printf(m, "- start (physical): %lx\n", info->code.phys_start);
-        seq_printf(m, "- end (virtual): %lx\n", info->code.vm_end);
-        seq_printf(m, "- end (PGD): %lx\n", info->code.pgd_end);
-        seq_printf(m, "- end (PUD): %lx\n", info->code.pud_end);
-        seq_printf(m, "- end (PMD): %lx\n", info->code.pmd_end);
-        seq_printf(m, "- end (PTE): %lx\n", info->code.pte_end);
-        seq_printf(m, "- end (physical): %lx\n", info->code.phys_end);
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->code.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx\n", info->code.pgd_start);
+        seq_printf(m, "- start (PUD): 0x%lx\n", info->code.pud_start);
+        seq_printf(m, "- start (PMD): 0x%lx\n", info->code.pmd_start);
+        seq_printf(m, "- start (PTE): 0x%lx\n", info->code.pte_start);
+        seq_printf(m, "- start (physical): 0x%lx\n", info->code.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->code.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx\n", info->code.pgd_end);
+        seq_printf(m, "- end (PUD): 0x%lx\n", info->code.pud_end);
+        seq_printf(m, "- end (PMD): 0x%lx\n", info->code.pmd_end);
+        seq_printf(m, "- end (PTE): 0x%lx\n", info->code.pte_end);
+        seq_printf(m, "- end (physical): 0x%lx\n", info->code.phys_end);
         seq_printf(m, "Data Area\n");
-        seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
-        seq_printf(m, "- start (PGD): %lx\n", info->data.pgd_start);
-        seq_printf(m, "- start (PUD): %lx\n", info->data.pud_start);
-        seq_printf(m, "- start (PMD): %lx\n", info->data.pmd_start);
-        seq_printf(m, "- start (PTE): %lx\n", info->data.pte_start);
-        seq_printf(m, "- start (physical): %lx\n", info->data.phys_start);
-        seq_printf(m, "- end (virtual): %lx\n", info->data.vm_end);
-        seq_printf(m, "- end (PGD): %lx\n", info->data.pgd_end);
-        seq_printf(m, "- end (PUD): %lx\n", info->data.pud_end);
-        seq_printf(m, "- end (PMD): %lx\n", info->data.pmd_end);
-        seq_printf(m, "- end (PTE): %lx\n", info->data.pte_end);
-        seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->data.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx\n", info->data.pgd_start);
+        seq_printf(m, "- start (PUD): 0x%lx\n", info->data.pud_start);
+        seq_printf(m, "- start (PMD): 0x%lx\n", info->data.pmd_start);
+        seq_printf(m, "- start (PTE): 0x%lx\n", info->data.pte_start);
+        seq_printf(m, "- start (physical): 0x%lx\n", info->data.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->data.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx\n", info->data.pgd_end);
+        seq_printf(m, "- end (PUD): 0x%lx\n", info->data.pud_end);
+        seq_printf(m, "- end (PMD): 0x%lx\n", info->data.pmd_end);
+        seq_printf(m, "- end (PTE): 0x%lx\n", info->data.pte_end);
+        seq_printf(m, "- end (physical): 0x%lx\n", info->data.phys_end);
         seq_printf(m, "Heap Area\n");
-        seq_printf(m, "- start (virtual): %lx\n", info->heap.vm_start);
-        seq_printf(m, "- start (PGD): %lx\n", info->heap.pgd_start);
-        seq_printf(m, "- start (PUD): %lx\n", info->heap.pud_start);
-        seq_printf(m, "- start (PMD): %lx\n", info->heap.pmd_start);
-        seq_printf(m, "- start (PTE): %lx\n", info->heap.pte_start);
-        seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
-        seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
-        seq_printf(m, "- end (PGD): %lx\n", info->heap.pgd_end);
-        seq_printf(m, "- end (PUD): %lx\n", info->heap.pud_end);
-        seq_printf(m, "- end (PMD): %lx\n", info->heap.pmd_end);
-        seq_printf(m, "- end (PTE): %lx\n", info->heap.pte_end);
-        seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->heap.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx\n", info->heap.pgd_start);
+        seq_printf(m, "- start (PUD): 0x%lx\n", info->heap.pud_start);
+        seq_printf(m, "- start (PMD): 0x%lx\n", info->heap.pmd_start);
+        seq_printf(m, "- start (PTE): 0x%lx\n", info->heap.pte_start);
+        seq_printf(m, "- start (physical): 0x%lx\n", info->heap.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->heap.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx\n", info->heap.pgd_end);
+        seq_printf(m, "- end (PUD): 0x%lx\n", info->heap.pud_end);
+        seq_printf(m, "- end (PMD): 0x%lx\n", info->heap.pmd_end);
+        seq_printf(m, "- end (PTE): 0x%lx\n", info->heap.pte_end);
+        seq_printf(m, "- end (physical): 0x%lx\n", info->heap.phys_end);
         seq_printf(m, "Stack Area\n");
-        seq_printf(m, "- start (virtual): %lx\n", info->stack.vm_start);
-        seq_printf(m, "- start (PGD): %lx\n", info->stack.pgd_start);
-        seq_printf(m, "- start (PUD): %lx\n", info->stack.pud_start);
-        seq_printf(m, "- start (PMD): %lx\n", info->stack.pmd_start);
-        seq_printf(m, "- start (PTE): %lx\n", info->stack.pte_start);
-        seq_printf(m, "- start (physical): %lx\n", info->stack.phys_start);
-        seq_printf(m, "- end (virtual): %lx\n", info->stack.vm_end);
-        seq_printf(m, "- end (PGD): %lx\n", info->stack.pgd_end);
-        seq_printf(m, "- end (PUD): %lx\n", info->stack.pud_end);
-        seq_printf(m, "- end (PMD): %lx\n", info->stack.pmd_end);
-        seq_printf(m, "- end (PTE): %lx\n", info->stack.pte_end);
-        seq_printf(m, "- end (physical): %lx\n", info->stack.phys_end);
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->stack.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx\n", info->stack.pgd_start);
+        seq_printf(m, "- start (PUD): 0x%lx\n", info->stack.pud_start);
+        seq_printf(m, "- start (PMD): 0x%lx\n", info->stack.pmd_start);
+        seq_printf(m, "- start (PTE): 0x%lx\n", info->stack.pte_start);
+        seq_printf(m, "- start (physical): 0x%lx\n", info->stack.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->stack.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx\n", info->stack.pgd_end);
+        seq_printf(m, "- end (PUD): 0x%lx\n", info->stack.pud_end);
+        seq_printf(m, "- end (PMD): 0x%lx\n", info->stack.pmd_end);
+        seq_printf(m, "- end (PTE): 0x%lx\n", info->stack.pte_end);
+        seq_printf(m, "- end (physical): 0x%lx\n", info->stack.phys_end);
         seq_printf(m, "--------------------------------------------------\n");
     }
 
