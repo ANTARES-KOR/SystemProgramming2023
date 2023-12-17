@@ -74,18 +74,18 @@ void add_task_to_history(struct task_struct *task) {
     info->code.phys_start = virt_to_phys((void *)info->code.vm_start);
     info->code.phys_end = virt_to_phys((void *)info->code.vm_end);
 
-    // info->data.vm_start = task->mm->start_data;
-    // info->data.vm_end = task->mm->end_data;
-    // info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
-    // info->data.pgd_end = pgd_offset(task->mm, info->data.vm_end);
-    // info->data.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_start), info->data.vm_start);
-    // info->data.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_end), info->data.vm_end);
-    // info->data.pmd_start = pmd_offset(info->data.pud_start, info->data.vm_start);
-    // info->data.pmd_end = pmd_offset(info->data.pud_end, info->data.vm_end);
-    // info->data.pte_start = pte_offset_kernel(info->data.pmd_start, info->data.vm_start);
-    // info->data.pte_end = pte_offset_kernel(info->data.pmd_end, info->data.vm_end);
-    // info->data.phys_start = virt_to_phys((void *)info->data.vm_start);
-    // info->data.phys_end = virt_to_phys((void *)info->data.vm_end);
+    info->data.vm_start = task->mm->start_data;
+    info->data.vm_end = task->mm->end_data;
+    info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
+    info->data.pgd_end = pgd_offset(task->mm, info->data.vm_end);
+    info->data.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_start), info->data.vm_start);
+    info->data.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_end), info->data.vm_end);
+    info->data.pmd_start = pmd_offset(info->data.pud_start, info->data.vm_start);
+    info->data.pmd_end = pmd_offset(info->data.pud_end, info->data.vm_end);
+    info->data.pte_start = pte_offset_kernel(info->data.pmd_start, info->data.vm_start);
+    info->data.pte_end = pte_offset_kernel(info->data.pmd_end, info->data.vm_end);
+    info->data.phys_start = virt_to_phys((void *)info->data.vm_start);
+    info->data.phys_end = virt_to_phys((void *)info->data.vm_end);
 
     // info->heap.vm_start = task->mm->start_brk;
     // info->heap.vm_end = task->mm->brk;
@@ -190,16 +190,19 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "- end (PMD): %lx\n", info->code.pmd_end);
         seq_printf(m, "- end (PTE): %lx\n", info->code.pte_end);
         seq_printf(m, "- end (physical): %lx\n", info->code.phys_end);
-        // seq_printf(m, "Data Area\n");
-        // seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
-        // seq_printf(m, "- start (physical): %lx\n", info->data.phys_start);
-        // seq_printf(m, "- end (virtual): %lx\n", info->data.vm_end);
-        // seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
-        // seq_printf(m, "Heap Area\n");
-        // seq_printf(m, "- start (virtual): %lx\n", info->heap.vm_start);
-        // seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
-        // seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
-        // seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
+        seq_printf(m, "Data Area\n");
+        seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
+        seq_printf(m, "- start (PGD): %lx\n", info->data.pgd_start);
+        seq_printf(m, "- start (PUD): %lx\n", info->data.pud_start);
+        seq_printf(m, "- start (PMD): %lx\n", info->data.pmd_start);
+        seq_printf(m, "- start (PTE): %lx\n", info->data.pte_start);
+        seq_printf(m, "- start (physical): %lx\n", info->data.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->data.vm_end);
+        seq_printf(m, "- end (PGD): %lx\n", info->data.pgd_end);
+        seq_printf(m, "- end (PUD): %lx\n", info->data.pud_end);
+        seq_printf(m, "- end (PMD): %lx\n", info->data.pmd_end);
+        seq_printf(m, "- end (PTE): %lx\n", info->data.pte_end);
+        seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
         seq_printf(m, "--------------------------------------------------\n");
     }
 
