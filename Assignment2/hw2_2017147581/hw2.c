@@ -147,7 +147,7 @@ void find_latest_task(void) {
 static struct timer_list my_timer;
 void timer_callback(struct timer_list *timer) {
     tasklet_schedule(&my_tasklet);
-    mod_timer(timer, jiffies + msecs_to_jiffies(INTERVAL * 1000));
+    mod_timer(timer, jiffies + INTERVAL * HZ);
 }
 
 // Tasklet handler function
