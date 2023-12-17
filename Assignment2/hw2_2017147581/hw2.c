@@ -104,6 +104,33 @@ void my_tasklet_handler(unsigned long data) {
     find_latest_task();
 }
 
+static int proc_show(struct seq_file *m, void *v) {
+    
+
+    // print the task information in the buffer
+    // from the oldest to the latest
+
+    int i;
+    struct task_info *info;
+
+    for (i = 0; i < MAX_TASKS; i++) {
+        info = &task_history[(current_index + i) % MAX_TASKS];
+        seq_printf(m, "PID: %d\n", info->pid);
+        seq_printf(m, "COMM: %s\n", info->comm);
+        seq_printf(m, "START_TIME: %llu\n", info->start_time_ns);
+        seq_printf(m, "UPTIME: %llu\n", timespec64_to_ns(&info->uptime));
+        seq_printf(m, "PGD_BASE: %p\n", info->pgd_base);
+        seq_printf(m, "CODE: %lx-%lx\n", info->code.vm_start, info->code.vm_end);
+        seq_printf(m, "DATA: %lx-%lx\n", info->data.vm_start, info->data.vm_end);
+        seq_printf(m, "HEAP: %lx-%lx\n", info->heap.vm_start, info->heap.vm_end);
+        seq_printf(m, "STACK: %lx-%lx\n", info->stack.vm_start, info->stack.vm_end);
+        seq_printf(m, "\n");
+    }
+
+
+    return 0;
+}
+
 static int proc_open(struct inode *inode, struct file *file) {
     return single_open(file, proc_show, NULL);
 }
