@@ -78,8 +78,8 @@ void add_task_to_history(struct task_struct *task) {
     info->data.vm_end = task->mm->end_data;
     info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
     info->data.pgd_end = pgd_offset(task->mm, info->data.vm_end);
-    info->data.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_start), info->data.vm_start);
-    info->data.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_end), info->data.vm_end);
+    info->data.pud_start = pud_offset(p4d_offset(info->data.pgd_start, info->data.vm_start), info->data.vm_start);
+    info->data.pud_end = pud_offset(p4d_offset(info->data.pgd_end, info->data.vm_end), info->data.vm_end);
     info->data.pmd_start = pmd_offset(info->data.pud_start, info->data.vm_start);
     info->data.pmd_end = pmd_offset(info->data.pud_end, info->data.vm_end);
     info->data.pte_start = pte_offset_kernel(info->data.pmd_start, info->data.vm_start);
@@ -87,18 +87,19 @@ void add_task_to_history(struct task_struct *task) {
     info->data.phys_start = virt_to_phys((void *)info->data.vm_start);
     info->data.phys_end = virt_to_phys((void *)info->data.vm_end);
 
-    // info->heap.vm_start = task->mm->start_brk;
-    // info->heap.vm_end = task->mm->brk;
-    // info->heap.pgd_start = pgd_offset(task->mm, info->heap.vm_start);
-    // info->heap.pgd_end = pgd_offset(task->mm, info->heap.vm_end);
-    // info->heap.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->heap.vm_start), info->heap.vm_start);
-    // info->heap.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->heap.vm_end), info->heap.vm_end);
-    // info->heap.pmd_start = pmd_offset(info->heap.pud_start, info->heap.vm_start);
-    // info->heap.pmd_end = pmd_offset(info->heap.pud_end, info->heap.vm_end);
-    // info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, info->heap.vm_start);
-    // info->heap.pte_end = pte_offset_kernel(info->heap.pmd_end, info->heap.vm_end);
-    // info->heap.phys_start = virt_to_phys((void *)info->heap.vm_start);
-    // info->heap.phys_end = virt_to_phys((void *)info->heap.vm_end);
+
+    info->heap.vm_start = task->mm->start_brk;
+    info->heap.vm_end = task->mm->brk;
+    info->heap.pgd_start = pgd_offset(task->mm, info->heap.vm_start);
+    info->heap.pgd_end = pgd_offset(task->mm, info->heap.vm_end);
+    info->heap.pud_start = pud_offset(p4d_offset(info->heap.pgd_start, info->heap.vm_start), info->heap.vm_start);
+    info->heap.pud_end = pud_offset(p4d_offset(info->heap.pgd_end, info->heap.vm_end), info->heap.vm_end);
+    info->heap.pmd_start = pmd_offset(info->heap.pud_start, info->heap.vm_start);
+    info->heap.pmd_end = pmd_offset(info->heap.pud_end, info->heap.vm_end);
+    info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, info->heap.vm_start);
+    info->heap.pte_end = pte_offset_kernel(info->heap.pmd_end, info->heap.vm_end);
+    info->heap.phys_start = virt_to_phys((void *)info->heap.vm_start);
+    info->heap.phys_end = virt_to_phys((void *)info->heap.vm_end);
 
     // down_read(&task->mm->mmap_lock);
     // mt_for_each(&task->mm->mm_mt, vma, mm_index, ULONG_MAX) {
@@ -107,8 +108,8 @@ void add_task_to_history(struct task_struct *task) {
     //         info->stack.vm_end = vma->vm_end;
     //         info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
     //         info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
-    //         info->stack.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_start), info->stack.vm_start);
-    //         info->stack.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_end), info->stack.vm_end);
+    //         info->stack.pud_start = pud_offset(p4d_offset(info->stack.pgd_start, info->stack.vm_start), info->stack.vm_start);
+    //         info->stack.pud_end = pud_offset(p4d_offset(info->stack.pgd_end, info->stack.vm_end), info->stack.vm_end);
     //         info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
     //         info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
     //         info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
