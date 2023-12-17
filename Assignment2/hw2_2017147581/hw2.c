@@ -68,7 +68,7 @@ void add_task_to_history(struct task_struct *task) {
             info->code.pgd_start = pgd_offset(task->mm, info->code.vm_start);
             info->code.pgd_end = pgd_offset(task->mm, info->code.vm_end);
             info->code.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->code.vm_start), info->code.vm_start);
-            info->code.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->code.vm_end), info-code.vm_end);
+            info->code.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->code.vm_end), info->code.vm_end);
             info->code.pmd_start = pmd_offset(info->code.pud_start, info->code.vm_start);
             info->code.pmd_end = pmd_offset(info->code.pud_end, info->code.vm_end);
             info->code.pte_start = pte_offset_kernel(info->code.pmd_start, info->code.vm_start);
@@ -82,7 +82,7 @@ void add_task_to_history(struct task_struct *task) {
             info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
             info->data.pgd_end = pgd_offset(task->mm, info->data.vm_end);
             info->data.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_start), info->data.vm_start);
-            info->data.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_end), info-data.vm_end);
+            info->data.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->data.vm_end), info->data.vm_end);
             info->data.pmd_start = pmd_offset(info->data.pud_start, info->data.vm_start);
             info->data.pmd_end = pmd_offset(info->data.pud_end, info->data.vm_end);
             info->data.pte_start = pte_offset_kernel(info->data.pmd_start, info->data.vm_start);
@@ -96,7 +96,7 @@ void add_task_to_history(struct task_struct *task) {
             info->heap.pgd_start = pgd_offset(task->mm, info->heap.vm_start);
             info->heap.pgd_end = pgd_offset(task->mm, info->heap.vm_end);
             info->heap.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->heap.vm_start), info->heap.vm_start);
-            info->heap.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->heap.vm_end), info-heap.vm_end);
+            info->heap.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->heap.vm_end), info->heap.vm_end);
             info->heap.pmd_start = pmd_offset(info->heap.pud_start, info->heap.vm_start);
             info->heap.pmd_end = pmd_offset(info->heap.pud_end, info->heap.vm_end);
             info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, info->heap.vm_start);
@@ -106,14 +106,14 @@ void add_task_to_history(struct task_struct *task) {
         }
         if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
             info->stack.vm_start = task->mm->start_stack;
-            info->stack.vm_end = task->mm->vm_end;
+            info->stack.vm_end = vma->vm_end;
             if (info->stack.vm_start < vma->vm_start) {
-                stack_end = task->mm->start_stack;
+                info->stack.vm_end = task->mm->start_stack;
             }
             info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
             info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
             info->stack.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_start), info->stack.vm_start);
-            info->stack.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_end), info-stack.vm_end);
+            info->stack.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_end), info->stack.vm_end);
             info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
             info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
             info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
