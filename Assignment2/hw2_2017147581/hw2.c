@@ -106,7 +106,10 @@ void add_task_to_history(struct task_struct *task) {
         }
         if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
             info->stack.vm_start = task->mm->start_stack;
-            info->stack.vm_end = task->mm->end_stack;
+            info->stack.vm_end = task->mm->vm_end;
+            if (info->stack.vm_start < vma->vm_start) {
+                stack_end = task->mm->start_stack;
+            }
             info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
             info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
             info->stack.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_start), info->stack.vm_start);
