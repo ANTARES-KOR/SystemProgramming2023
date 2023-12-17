@@ -56,13 +56,8 @@ void add_task_to_history(struct task_struct *task) {
     info = &task_history[current_index];
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
-    info->start_time_ns = task->start_time;
-    // calculate uptime = time after boot - start time
-    if(jiffies_to_nsecs(jiffies) < info->start_time_ns) {
-        info->uptime_ns = jiffies_to_nsecs(jiffies) + (0xffffffffffffffff - info->start_time_ns);
-    } else {
-        info->uptime_ns = jiffies_to_nsecs(jiffies) - info->start_time_ns;
-    } 
+    info->start_time = task->start_time / HZ;
+    info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
     info->pgd_base = task->mm->pgd;
 
     long unsigned mm_index = 0;
@@ -180,10 +175,10 @@ static int proc_show(struct seq_file *m, void *v) {
     for (i = 0; i < min(task_count, MAX_TASKS); i++) {
         info = &task_history[(current_index + i + max(MAX_TASKS - task_count, 0)) % MAX_TASKS];
         seq_printf(m, "[Trace #%d]\n", i);
-        seq_printf(m, "Uptime (s): %llu\n", info->uptime_ns / 1000000000);
+        seq_printf(m, "Uptime (s): %llu\n", info->uptime);
         seq_printf(m, "Command: %s\n", info->comm);
         seq_printf(m, "PID: %d\n", info->pid);
-        seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000);
+        seq_printf(m, "Start time (s): %llu\n", info->start_time);
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
         seq_printf(m, "Code Area\n");
         seq_printf(m, "- start (virtual): 0x%lx\n", info->code.vm_start);
