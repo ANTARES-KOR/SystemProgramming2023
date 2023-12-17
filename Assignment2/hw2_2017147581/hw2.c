@@ -141,7 +141,7 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "[Trace #%d]\n", i);
         seq_printf(m, "Command: %s\n", info->comm);
         seq_printf(m, "PID: %d\n", info->pid);
-        seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000
+        seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000);
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
         seq_printf(m, "CODE: %lx-%lx\n", info->code.vm_start, info->code.vm_end);
         seq_printf(m, "DATA: %lx-%lx\n", info->data.vm_start, info->data.vm_end);
