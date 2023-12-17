@@ -6,4 +6,8 @@ default:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 clean:
 	rm -rf *.ko *.mod *.mod.* .*.cmd *.o *.symvers *.order
+run: default
+	sudo rmmod hw2
+	sudo insmod hw2.ko
+	# cat /proc/hw2
 	
