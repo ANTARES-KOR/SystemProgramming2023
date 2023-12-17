@@ -27,8 +27,8 @@ DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
 struct task_info {
     pid_t pid;
     char comm[TASK_COMM_LEN];
-    u64 uptime;
-    u64 start_time;
+    int uptime;
+    int start_time;
     pgd_t *pgd_base;
     struct {
         unsigned long vm_start, vm_end;
@@ -57,9 +57,7 @@ void add_task_to_history(struct task_struct *task) {
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
     // change nanoseconds to seconds
-    info->start_time_ns = task->start_time;
     info->start_time = task->start_time / 1000000000;
-    // change jiffies to seconds
     info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
     info->pgd_base = task->mm->pgd;
 
