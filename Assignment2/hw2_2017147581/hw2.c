@@ -27,8 +27,8 @@ DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
 struct task_info {
     pid_t pid;
     char comm[TASK_COMM_LEN];
-    u64 uptime_ns;
-    u64 start_time_ns;
+    u64 uptime;
+    u64 start_time;
     pgd_t *pgd_base;
     struct {
         unsigned long vm_start, vm_end;
