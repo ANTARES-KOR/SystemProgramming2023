@@ -32,6 +32,10 @@ struct task_info {
     pgd_t *pgd_base;
     struct {
         unsigned long vm_start, vm_end;
+        unsigned long pgd_start, pgd_end;
+        unsigned long pud_start, pud_end;
+        unsigned long pmd_start, pmd_end;
+        unsigned long pte_start, pte_end;
         unsigned long phys_start, phys_end;
     } stack, data, code, heap;
 };
@@ -132,8 +136,8 @@ static int proc_show(struct seq_file *m, void *v) {
     seq_printf(m, "[System Programming Assignment #2]\n");
     seq_printf(m, "ID : 2017147581\n");
     seq_printf(m, "Name: Seo, Hyeokjun\n");
-    seq_printf(m, "Uptime(s): %lu\n", jiffies_to_msecs(jiffies) / 1000);
-    seq_printf(m, "--------------------------------------------------");
+    seq_printf(m, "Uptime(s): %u\n", jiffies_to_msecs(jiffies) / 1000);
+    seq_printf(m, "--------------------------------------------------\n");
 
 
     for (i = 0; i < min(task_count, MAX_TASKS); i++) {
@@ -143,11 +147,27 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "PID: %d\n", info->pid);
         seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000);
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
-        seq_printf(m, "CODE: %lx-%lx\n", info->code.vm_start, info->code.vm_end);
-        seq_printf(m, "DATA: %lx-%lx\n", info->data.vm_start, info->data.vm_end);
-        seq_printf(m, "HEAP: %lx-%lx\n", info->heap.vm_start, info->heap.vm_end);
-        seq_printf(m, "STACK: %lx-%lx\n", info->stack.vm_start, info->stack.vm_end);
-        seq_printf(m, "\n");
+        seq_printf(m, "Code Area\n")
+        seq_printf(m, "- start (virtual): %lx\n", info->code.vm_start);
+        seq_printf(m, "- start (physical): %lx\n", info->code.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->code.vm_end);
+        seq_printf(m, "- end (physical): %lx\n", info->code.phys_end);
+        seq_printf(m, "Data Area\n")
+        seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
+        seq_printf(m, "- start (physical): %lx\n", info->data.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->data.vm_end);
+        seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
+        seq_printf(m, "Heap Area\n")
+        seq_printf(m, "- start (virtual): %lx\n", info->heap.vm_start);
+        seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
+        seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
+        seq_printf(m, "Stack Area\n")
+        seq_printf(m, "- start (virtual): %lx\n", info->stack.vm_start);
+        seq_printf(m, "- start (physical): %lx\n", info->stack.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->stack.vm_end);
+        seq_printf(m, "- end (physical): %lx\n", info->stack.phys_end);
+        seq_printf(m, "--------------------------------------------------\n");
     }
 
 
