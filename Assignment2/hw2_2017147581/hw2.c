@@ -8,6 +8,7 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <linux/interrupt.h>
+#include <linux/maple_tree.h>
 
 
 #define PROC_NAME "hw2"
@@ -53,7 +54,8 @@ void add_task_to_history(struct task_struct *task) {
     info->start_time_ns = &task->start_time;
     info->pgd_base = task->mm->pgd;
 
-    for (vma = task->mm->mmap; vma; vma = vma->vm_next) {
+    down_read(&task->mm->mmap_lock);
+    mt_for_each(task->mm->mm_mt, vma) {
         if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
             info->code.vm_start = vma->vm_start;
             info->code.vm_end = vma->vm_end;
@@ -79,6 +81,7 @@ void add_task_to_history(struct task_struct *task) {
             info->stack.phys_end = virt_to_phys((void *)vma->vm_end);
         }
     }
+    up_read(&task->mm->mmap_lock);
 
     current_index = (current_index + 1) % MAX_TASKS;
 }
@@ -144,7 +147,7 @@ static int proc_open(struct inode *inode, struct file *file) {
     return single_open(file, proc_show, NULL);
 }
 
-static const struct file_operations proc_fops = {
+static const struct proc_ops proc_fops = {
     .owner = THIS_MODULE,
     .open = proc_open,
     .read = seq_read,
