@@ -62,62 +62,62 @@ void add_task_to_history(struct task_struct *task) {
     long unsigned mm_index = 0;
     down_read(&task->mm->mmap_lock);
     mt_for_each(&task->mm->mm_mt, vma, mm_index, ULONG_MAX) {
-        // if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
-        info->code.vm_start = vma->vm_start;
-        info->code.vm_end = vma->vm_end;
-        info->code.pgd_start = pgd_offset(task->mm, vma->vm_start);
-        info->code.pgd_end = pgd_offset(task->mm, vma->vm_end);
-        info->code.pud_start = pud_offset(info->code.pgd_start, vma->vm_start);
-        info->code.pud_end = pud_offset(info->code.pgd_end, vma->vm_end);
-        info->code.pmd_start = pmd_offset(info->code.pud_start, vma->vm_start);
-        info->code.pmd_end = pmd_offset(info->code.pud_end, vma->vm_end);
-        info->code.pte_start = pte_offset_kernel(info->code.pmd_start, vma->vm_start);
-        info->code.pte_end = pte_offset_kernel(info->code.pmd_end, vma->vm_end);
-        info->code.phys_start = virt_to_phys((void *)vma->vm_start);
-        info->code.phys_end = virt_to_phys((void *)vma->vm_end);
-        // }
-        // if (vma->vm_start <= task->mm->start_data && vma->vm_end >= task->mm->end_data) {
-        info->data.vm_start = vma->vm_start;
-        info->data.vm_end = vma->vm_end;
-        info->data.pgd_start = pgd_offset(task->mm, vma->vm_start);
-        info->data.pgd_end = pgd_offset(task->mm, vma->vm_end);
-        info->data.pud_start = pud_offset(info->data.pgd_start, vma->vm_start);
-        info->data.pud_end = pud_offset(info->data.pgd_end, vma->vm_end);
-        info->data.pmd_start = pmd_offset(info->data.pud_start, vma->vm_start);
-        info->data.pmd_end = pmd_offset(info->data.pud_end, vma->vm_end);
-        info->data.pte_start = pte_offset_kernel(info->data.pmd_start, vma->vm_start);
-        info->data.pte_end = pte_offset_kernel(info->data.pmd_end, vma->vm_end);
-        info->data.phys_start = virt_to_phys((void *)vma->vm_start);
-        info->data.phys_end = virt_to_phys((void *)vma->vm_end);
-        // }
-        // if (vma->vm_start <= task->mm->start_brk && vma->vm_end >= task->mm->brk) {
-        info->heap.vm_start = vma->vm_start;
-        info->heap.vm_end = vma->vm_end;
-        info->heap.pgd_start = pgd_offset(task->mm, vma->vm_start);
-        info->heap.pgd_end = pgd_offset(task->mm, vma->vm_end);
-        info->heap.pud_start = pud_offset(info->heap.pgd_start, vma->vm_start);
-        info->heap.pud_end = pud_offset(info->heap.pgd_end, vma->vm_end);
-        info->heap.pmd_start = pmd_offset(info->heap.pud_start, vma->vm_start);
-        info->heap.pmd_end = pmd_offset(info->heap.pud_end, vma->vm_end);
-        info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, vma->vm_start);
-        info->heap.pte_end = pte_offset_kernel(info->heap.pmd_end, vma->vm_end);
-        info->heap.phys_start = virt_to_phys((void *)vma->vm_start);
-        info->heap.phys_end = virt_to_phys((void *)vma->vm_end);
-        // }
-        // if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
-        info->stack.vm_start = vma->vm_start;
-        info->stack.vm_end = vma->vm_end;
-        info->stack.pgd_start = pgd_offset(task->mm, vma->vm_start);
-        info->stack.pgd_end = pgd_offset(task->mm, vma->vm_end);
-        info->stack.pud_start = pud_offset(info->stack.pgd_start, vma->vm_start);
-        info->stack.pud_end = pud_offset(info->stack.pgd_end, vma->vm_end);
-        info->stack.pmd_start = pmd_offset(info->stack.pud_start, vma->vm_start);
-        info->stack.pmd_end = pmd_offset(info->stack.pud_end, vma->vm_end);
-        info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, vma->vm_start);
-        info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, vma->vm_end);
-        info->stack.phys_start = virt_to_phys((void *)vma->vm_start);
-        info->stack.phys_end = virt_to_phys((void *)vma->vm_end);
-        // }
+        if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
+            info->code.vm_start = vma->vm_start;
+            info->code.vm_end = vma->vm_end;
+            info->code.pgd_start = pgd_offset(task->mm, vma->vm_start);
+            info->code.pgd_end = pgd_offset(task->mm, vma->vm_end);
+            info->code.pud_start = pud_offset(info->code.pgd_start, vma->vm_start);
+            info->code.pud_end = pud_offset(info->code.pgd_end, vma->vm_end);
+            info->code.pmd_start = pmd_offset(info->code.pud_start, vma->vm_start);
+            info->code.pmd_end = pmd_offset(info->code.pud_end, vma->vm_end);
+            info->code.pte_start = pte_offset_kernel(info->code.pmd_start, vma->vm_start);
+            info->code.pte_end = pte_offset_kernel(info->code.pmd_end, vma->vm_end);
+            info->code.phys_start = virt_to_phys((void *)vma->vm_start);
+            info->code.phys_end = virt_to_phys((void *)vma->vm_end);
+        }
+        if (vma->vm_start <= task->mm->start_data && vma->vm_end >= task->mm->end_data) {
+            info->data.vm_start = vma->vm_start;
+            info->data.vm_end = vma->vm_end;
+            info->data.pgd_start = pgd_offset(task->mm, vma->vm_start);
+            info->data.pgd_end = pgd_offset(task->mm, vma->vm_end);
+            info->data.pud_start = pud_offset(info->data.pgd_start, vma->vm_start);
+            info->data.pud_end = pud_offset(info->data.pgd_end, vma->vm_end);
+            info->data.pmd_start = pmd_offset(info->data.pud_start, vma->vm_start);
+            info->data.pmd_end = pmd_offset(info->data.pud_end, vma->vm_end);
+            info->data.pte_start = pte_offset_kernel(info->data.pmd_start, vma->vm_start);
+            info->data.pte_end = pte_offset_kernel(info->data.pmd_end, vma->vm_end);
+            info->data.phys_start = virt_to_phys((void *)vma->vm_start);
+            info->data.phys_end = virt_to_phys((void *)vma->vm_end);
+        }
+        if (vma->vm_start <= task->mm->start_brk && vma->vm_end >= task->mm->brk) {
+            info->heap.vm_start = vma->vm_start;
+            info->heap.vm_end = vma->vm_end;
+            info->heap.pgd_start = pgd_offset(task->mm, vma->vm_start);
+            info->heap.pgd_end = pgd_offset(task->mm, vma->vm_end);
+            info->heap.pud_start = pud_offset(info->heap.pgd_start, vma->vm_start);
+            info->heap.pud_end = pud_offset(info->heap.pgd_end, vma->vm_end);
+            info->heap.pmd_start = pmd_offset(info->heap.pud_start, vma->vm_start);
+            info->heap.pmd_end = pmd_offset(info->heap.pud_end, vma->vm_end);
+            info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, vma->vm_start);
+            info->heap.pte_end = pte_offset_kernel(info->heap.pmd_end, vma->vm_end);
+            info->heap.phys_start = virt_to_phys((void *)vma->vm_start);
+            info->heap.phys_end = virt_to_phys((void *)vma->vm_end);
+        }
+        if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
+            info->stack.vm_start = vma->vm_start;
+            info->stack.vm_end = vma->vm_end;
+            info->stack.pgd_start = pgd_offset(task->mm, vma->vm_start);
+            info->stack.pgd_end = pgd_offset(task->mm, vma->vm_end);
+            info->stack.pud_start = pud_offset(info->stack.pgd_start, vma->vm_start);
+            info->stack.pud_end = pud_offset(info->stack.pgd_end, vma->vm_end);
+            info->stack.pmd_start = pmd_offset(info->stack.pud_start, vma->vm_start);
+            info->stack.pmd_end = pmd_offset(info->stack.pud_end, vma->vm_end);
+            info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, vma->vm_start);
+            info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, vma->vm_end);
+            info->stack.phys_start = virt_to_phys((void *)vma->vm_start);
+            info->stack.phys_end = virt_to_phys((void *)vma->vm_end);
+        }
     }
     up_read(&task->mm->mmap_lock);
 
