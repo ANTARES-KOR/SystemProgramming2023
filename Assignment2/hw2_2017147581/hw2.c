@@ -240,10 +240,46 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "- end (physical): 0x%lx\n", info->code.phys_end);
 
         seq_printf(m, "Data Area\n");
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->data.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->data.pgd_start, pgd_val((pgd_t){info->data.pgd_start}));
+        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->data.pud_start, pud_val((pud_t){info->data.pud_start}));
+        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->data.pmd_start, pmd_val((pmd_t){info->data.pmd_start}));
+        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->data.pte_start, pte_val((pte_t){info->data.pte_start}));
+        seq_printf(m, "- start (physical): 0x%lx\n", info->data.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->data.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->data.pgd_end, pgd_val((pgd_t){info->data.pgd_end}));
+        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->data.pud_end, pud_val((pud_t){info->data.pud_end}));
+        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->data.pmd_end, pmd_val((pmd_t){info->data.pmd_end}));
+        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->data.pte_end, pte_val((pte_t){info->data.pte_end}));
+        seq_printf(m, "- end (physical): 0x%lx\n", info->data.phys_end);
 
         seq_printf(m, "Heap Area\n");
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->heap.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->heap.pgd_start, pgd_val((pgd_t){info->heap.pgd_start}));
+        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->heap.pud_start, pud_val((pud_t){info->heap.pud_start}));
+        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->heap.pmd_start, pmd_val((pmd_t){info->heap.pmd_start}));
+        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->heap.pte_start, pte_val((pte_t){info->heap.pte_start}));
+        seq_printf(m, "- start (physical): 0x%lx\n", info->heap.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->heap.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->heap.pgd_end, pgd_val((pgd_t){info->heap.pgd_end}));
+        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->heap.pud_end, pud_val((pud_t){info->heap.pud_end}));
+        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->heap.pmd_end, pmd_val((pmd_t){info->heap.pmd_end}));
+        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->heap.pte_end, pte_val((pte_t){info->heap.pte_end}));
+        seq_printf(m, "- end (physical): 0x%lx\n", info->heap.phys_end);
 
         seq_printf(m, "Stack Area\n");
+        seq_printf(m, "- start (virtual): 0x%lx\n", info->stack.vm_start);
+        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->stack.pgd_start, pgd_val((pgd_t){info->stack.pgd_start}));
+        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->stack.pud_start, pud_val((pud_t){info->stack.pud_start}));
+        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->stack.pmd_start, pmd_val((pmd_t){info->stack.pmd_start}));
+        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->stack.pte_start, pte_val((pte_t){info->stack.pte_start}));
+        seq_printf(m, "- start (physical): 0x%lx\n", info->stack.phys_start);
+        seq_printf(m, "- end (virtual): 0x%lx\n", info->stack.vm_end);
+        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->stack.pgd_end, pgd_val((pgd_t){info->stack.pgd_end}));
+        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->stack.pud_end, pud_val((pud_t){info->stack.pud_end}));
+        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->stack.pmd_end, pmd_val((pmd_t){info->stack.pmd_end}));
+        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->stack.pte_end, pte_val((pte_t){info->stack.pte_end}));
+        seq_printf(m, "- end (physical): 0x%lx\n", info->stack.phys_end);
 
         seq_printf(m, "--------------------------------------------------\n");
     }
