@@ -5,18 +5,29 @@
 #include <linux/mm_types.h>     // for mm_struct
 #include <linux/mm.h>           // for vm_area_struct
 #include <linux/jiffies.h>      // for jiffies and time calculations
+#include <linux/proc_fs.h>
+#include <linux/seq_file.h>
+#include <linux/interrupt.h>
+
+
+#define PROC_NAME "hw2"
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Hyeokjun, Seo");
 MODULE_DESCRIPTION("A module that tracks the most recently started non-kernel task.");
+
+int interval = 10;
+
+
+void my_tasklet_handler(struct tasklet_struct *tsk);
+DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
 
 
 // Structure to hold task information
 struct task_info {
     pid_t pid;
     char comm[TASK_COMM_LEN];
-    unsigned long long start_time_ns;
-    struct timespec64 uptime;
+    u64 start_time_ns;
     pgd_t *pgd_base;
     struct {
         unsigned long vm_start, vm_end;
@@ -39,8 +50,7 @@ void add_task_to_history(struct task_struct *task) {
     info = &task_history[current_index];
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
-    info->start_time_ns = timespec64_to_ns(&task->real_start_time);
-    info->uptime = timespec64_sub(current_kernel_time64(), ns_to_timespec64(info->start_time_ns));
+    info->start_time_ns = &task->start_time;
     info->pgd_base = task->mm->pgd;
 
     for (vma = task->mm->mmap; vma; vma = vma->vm_next) {
@@ -96,11 +106,11 @@ void find_latest_task(void) {
 static struct timer_list my_timer;
 void timer_callback(struct timer_list *timer) {
     tasklet_schedule(&my_tasklet);
-    mod_timer(timer, jiffies + msecs_to_jiffies(10 * 1000));
+    mod_timer(timer, jiffies + msecs_to_jiffies(interval * 1000));
 }
 
 // Tasklet handler function
-void my_tasklet_handler(unsigned long data) {
+void my_tasklet_handler(struct tasklet_struct *tsk) {
     find_latest_task();
 }
 
@@ -118,7 +128,6 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "PID: %d\n", info->pid);
         seq_printf(m, "COMM: %s\n", info->comm);
         seq_printf(m, "START_TIME: %llu\n", info->start_time_ns);
-        seq_printf(m, "UPTIME: %llu\n", timespec64_to_ns(&info->uptime));
         seq_printf(m, "PGD_BASE: %p\n", info->pgd_base);
         seq_printf(m, "CODE: %lx-%lx\n", info->code.vm_start, info->code.vm_end);
         seq_printf(m, "DATA: %lx-%lx\n", info->data.vm_start, info->data.vm_end);
@@ -143,8 +152,10 @@ static const struct file_operations proc_fops = {
     .release = single_release,
 };
 
+struct proc_dir_entry *proc_entry;
+
 static int __init my_module_init(void) {
-    proc_entry = proc_create("hw2", 0, NULL, &proc_fops);
+    proc_entry = proc_create(PROC_NAME, 0, NULL, &proc_fops);
     if (!proc_entry) {
         return -ENOMEM;
     }
@@ -163,5 +174,5 @@ static void __exit my_module_exit(void) {
 
 }
 
-
-DECLARE_TASKLET(my_tasklet, my_tasklet_handler, 0);
+module_init(my_module_init);
+module_exit(my_module_exit);
