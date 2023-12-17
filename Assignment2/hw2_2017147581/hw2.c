@@ -204,6 +204,19 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "- end (PMD): %lx\n", info->data.pmd_end);
         seq_printf(m, "- end (PTE): %lx\n", info->data.pte_end);
         seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
+        seq_printf(m, "Heap Area\n");
+        seq_printf(m, "- start (virtual): %lx\n", info->heap.vm_start);
+        seq_printf(m, "- start (PGD): %lx\n", info->heap.pgd_start);
+        seq_printf(m, "- start (PUD): %lx\n", info->heap.pud_start);
+        seq_printf(m, "- start (PMD): %lx\n", info->heap.pmd_start);
+        seq_printf(m, "- start (PTE): %lx\n", info->heap.pte_start);
+        seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
+        seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
+        seq_printf(m, "- end (PGD): %lx\n", info->heap.pgd_end);
+        seq_printf(m, "- end (PUD): %lx\n", info->heap.pud_end);
+        seq_printf(m, "- end (PMD): %lx\n", info->heap.pmd_end);
+        seq_printf(m, "- end (PTE): %lx\n", info->heap.pte_end);
+        seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
         seq_printf(m, "--------------------------------------------------\n");
     }
 
