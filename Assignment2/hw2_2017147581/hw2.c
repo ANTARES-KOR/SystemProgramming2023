@@ -55,7 +55,7 @@ void add_task_to_history(struct task_struct *task) {
     info->pgd_base = task->mm->pgd;
 
     down_read(&task->mm->mmap_lock);
-    mt_for_each(task->mm->mm_mt, vma) {
+    mt_for_each(task->mm->mm_mt, vma, 0, ULONG_MAX) {
         if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
             info->code.vm_start = vma->vm_start;
             info->code.vm_end = vma->vm_end;
@@ -148,33 +148,30 @@ static int proc_open(struct inode *inode, struct file *file) {
 }
 
 static const struct proc_ops proc_fops = {
-    .owner = THIS_MODULE,
     .open = proc_open,
     .read = seq_read,
     .llseek = seq_lseek,
     .release = single_release,
 };
 
-struct proc_dir_entry *proc_entry;
-
 static int __init my_module_init(void) {
-    proc_entry = proc_create(PROC_NAME, 0, NULL, &proc_fops);
-    if (!proc_entry) {
-        return -ENOMEM;
-    }
+    proc_create(PROC_NAME, 0, NULL, &proc_fops);
 
     timer_setup(&my_timer, timer_callback, 0);
     mod_timer(&my_timer, jiffies);
+
+    printk(KERN_INFO "hw2 module loaded\n");
 
     return 0;
 }
 
 static void __exit my_module_exit(void) {
 
-    proc_remove(proc_entry);
+    remove_proc_entry(PROC_NAME, NULL);
     timer_delete(&my_timer);
     tasklet_kill(&my_tasklet);
 
+    printk(KERN_INFO "hw2 module unloaded\n");
 }
 
 module_init(my_module_init);
