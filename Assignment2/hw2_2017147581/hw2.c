@@ -104,20 +104,20 @@ void add_task_to_history(struct task_struct *task) {
             info->heap.phys_start = virt_to_phys((void *)info->heap.vm_start);
             info->heap.phys_end = virt_to_phys((void *)info->heap.vm_end);
         }
-        if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
-            info->stack.vm_start = task->mm->start_stack;
-            info->stack.vm_end = vma->vm_end;
-            info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
-            info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
-            info->stack.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_start), info->stack.vm_start);
-            info->stack.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_end), info->stack.vm_end);
-            info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
-            info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
-            info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
-            info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, info->stack.vm_end);
-            info->stack.phys_start = virt_to_phys((void *)info->stack.vm_start);
-            info->stack.phys_end = virt_to_phys((void *)info->stack.vm_end);
-        }
+        // if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
+        //     info->stack.vm_start = task->mm->start_stack;
+        //     info->stack.vm_end = vma->vm_end;
+        //     info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
+        //     info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
+        //     info->stack.pud_start = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_start), info->stack.vm_start);
+        //     info->stack.pud_end = pud_offset(p4d_offset(task->mm->pgd, info->stack.vm_end), info->stack.vm_end);
+        //     info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
+        //     info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
+        //     info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
+        //     info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, info->stack.vm_end);
+        //     info->stack.phys_start = virt_to_phys((void *)info->stack.vm_start);
+        //     info->stack.phys_end = virt_to_phys((void *)info->stack.vm_end);
+        // }
     }
     up_read(&task->mm->mmap_lock);
 
@@ -202,11 +202,11 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
         seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
         seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
-        seq_printf(m, "Stack Area\n");
-        seq_printf(m, "- start (virtual): %lx\n", info->stack.vm_start);
-        seq_printf(m, "- start (physical): %lx\n", info->stack.phys_start);
-        seq_printf(m, "- end (virtual): %lx\n", info->stack.vm_end);
-        seq_printf(m, "- end (physical): %lx\n", info->stack.phys_end);
+        // seq_printf(m, "Stack Area\n");
+        // seq_printf(m, "- start (virtual): %lx\n", info->stack.vm_start);
+        // seq_printf(m, "- start (physical): %lx\n", info->stack.phys_start);
+        // seq_printf(m, "- end (virtual): %lx\n", info->stack.vm_end);
+        // seq_printf(m, "- end (physical): %lx\n", info->stack.phys_end);
         seq_printf(m, "--------------------------------------------------\n");
     }
 
