@@ -51,11 +51,11 @@ void add_task_to_history(struct task_struct *task) {
     info = &task_history[current_index];
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
-    info->start_time_ns = &task->start_time;
+    info->start_time_ns = task->start_time;
     info->pgd_base = task->mm->pgd;
 
     down_read(&task->mm->mmap_lock);
-    mt_for_each(task->mm->mm_mt, vma, 0, ULONG_MAX) {
+    mt_for_each(&task->mm->mm_mt, vma, 0, ULONG_MAX) {
         if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
             info->code.vm_start = vma->vm_start;
             info->code.vm_end = vma->vm_end;
@@ -148,10 +148,10 @@ static int proc_open(struct inode *inode, struct file *file) {
 }
 
 static const struct proc_ops proc_fops = {
-    .open = proc_open,
-    .read = seq_read,
-    .llseek = seq_lseek,
-    .release = single_release,
+    .proc_open = proc_open,
+    .proc_read = seq_read,
+    .proc_llseek = seq_lseek,
+    .proc_release = single_release,
 };
 
 static int __init my_module_init(void) {
