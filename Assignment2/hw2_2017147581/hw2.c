@@ -17,8 +17,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Hyeokjun, Seo");
 MODULE_DESCRIPTION("A module that tracks the most recently started non-kernel task.");
 
-int interval = 10;
-
+#define INTERVAL 5
 
 void my_tasklet_handler(struct tasklet_struct *tsk);
 DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
@@ -116,7 +115,7 @@ void find_latest_task(void) {
 static struct timer_list my_timer;
 void timer_callback(struct timer_list *timer) {
     tasklet_schedule(&my_tasklet);
-    mod_timer(timer, jiffies + msecs_to_jiffies(interval * 1000));
+    mod_timer(timer, jiffies + msecs_to_jiffies(INTERVAL * 1000));
 }
 
 // Tasklet handler function
