@@ -58,7 +58,11 @@ void add_task_to_history(struct task_struct *task) {
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
     info->start_time_ns = task->start_time;
     // calculate uptime = time after boot - start time
-    info->uptime_ns = jiffies_to_nsecs(jiffies) - info->start_time_ns;
+    if(jiffies_to_nsecs(jiffies) < info->start_time_ns) {
+        info->uptime_ns = jiffies_to_nsecs(jiffies) + (0xffffffffffffffff - info->start_time_ns);
+    } else {
+        info->uptime_ns = jiffies_to_nsecs(jiffies) - info->start_time_ns;
+    } 
     info->pgd_base = task->mm->pgd;
 
     long unsigned mm_index = 0;
