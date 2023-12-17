@@ -57,7 +57,9 @@ void add_task_to_history(struct task_struct *task) {
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
     // change nanoseconds to seconds
+    info->start_time_ns = task->start_time;
     info->start_time = task->start_time / 1000000000;
+    // change jiffies to seconds
     info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
     info->pgd_base = task->mm->pgd;
 
@@ -169,7 +171,7 @@ static int proc_show(struct seq_file *m, void *v) {
     seq_printf(m, "[System Programming Assignment #2]\n");
     seq_printf(m, "ID : 2017147581\n");
     seq_printf(m, "Name: Seo, Hyeokjun\n");
-    seq_printf(m, "Uptime(s): %u\n", jiffies_to_msecs(jiffies) / 1000);
+    seq_printf(m, "Uptime (s): %u\n", jiffies_to_msecs(jiffies) / 1000);
     seq_printf(m, "--------------------------------------------------\n");
 
 
