@@ -155,7 +155,7 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "PID: %d\n", info->pid);
         seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000);
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
-        seq_printf(m, "Code Area\n")
+        seq_printf(m, "Code Area\n");
         seq_printf(m, "- start (virtual): %lx\n", info->code.vm_start);
         seq_printf(m, "- start (PGD): %lx\n", info->code.pgd_start);
         seq_printf(m, "- start (PUD): %lx\n", info->code.pud_start);
@@ -168,17 +168,17 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "- end (PMD): %lx\n", info->code.pmd_end);
         seq_printf(m, "- end (PTE): %lx\n", info->code.pte_end);
         seq_printf(m, "- end (physical): %lx\n", info->code.phys_end);
-        seq_printf(m, "Data Area\n")
+        seq_printf(m, "Data Area\n");
         seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
         seq_printf(m, "- start (physical): %lx\n", info->data.phys_start);
         seq_printf(m, "- end (virtual): %lx\n", info->data.vm_end);
         seq_printf(m, "- end (physical): %lx\n", info->data.phys_end);
-        seq_printf(m, "Heap Area\n")
+        seq_printf(m, "Heap Area\n");
         seq_printf(m, "- start (virtual): %lx\n", info->heap.vm_start);
         seq_printf(m, "- start (physical): %lx\n", info->heap.phys_start);
         seq_printf(m, "- end (virtual): %lx\n", info->heap.vm_end);
         seq_printf(m, "- end (physical): %lx\n", info->heap.phys_end);
-        seq_printf(m, "Stack Area\n")
+        seq_printf(m, "Stack Area\n");
         seq_printf(m, "- start (virtual): %lx\n", info->stack.vm_start);
         seq_printf(m, "- start (physical): %lx\n", info->stack.phys_start);
         seq_printf(m, "- end (virtual): %lx\n", info->stack.vm_end);
