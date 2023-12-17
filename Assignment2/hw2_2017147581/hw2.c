@@ -54,7 +54,7 @@ void add_task_to_history(struct task_struct *task) {
     info->start_time_ns = task->start_time;
     info->pgd_base = task->mm->pgd;
 
-    int mm_index = 0;
+    unsigned long mm_index = 0;
     down_read(&task->mm->mmap_lock);
     mt_for_each(&task->mm->mm_mt, vma, mm_index, ULONG_MAX) {
         if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
