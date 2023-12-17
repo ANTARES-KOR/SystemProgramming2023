@@ -40,6 +40,7 @@ struct task_info {
 #define MAX_TASKS 5
 static struct task_info task_history[MAX_TASKS];
 static int current_index = 0;
+static int task_count = 0;
 
 // Function to add task information to the buffer
 void add_task_to_history(struct task_struct *task) {
@@ -85,6 +86,7 @@ void add_task_to_history(struct task_struct *task) {
     up_read(&task->mm->mmap_lock);
 
     current_index = (current_index + 1) % MAX_TASKS;
+    task_count++;
 }
 
 // finds the latest task and adds it to the buffer
@@ -127,12 +129,20 @@ static int proc_show(struct seq_file *m, void *v) {
     int i;
     struct task_info *info;
 
-    for (i = 0; i < MAX_TASKS; i++) {
-        info = &task_history[(current_index + i) % MAX_TASKS];
+    seq_printf(m, "[System Programming Assignment #2]\n");
+    seq_printf(m, "ID : 2017147581\n");
+    seq_printf(m, "Name: Seo, Hyeokjun\n");
+    seq_printf(m, "Uptime(s): %lu\n", jiffies_to_msecs(jiffies) / 1000);
+    seq_printf(m, "--------------------------------------------------");
+
+
+    for (i = 0; i < min(task_count, MAX_TASKS); i++) {
+        info = &task_history[(current_index + i + max(MAX_TASKS - task_count, 0)) % MAX_TASKS];
+        seq_printf(m, "[Trace #%d]\n", i);
+        seq_printf(m, "Command: %s\n", info->comm);
         seq_printf(m, "PID: %d\n", info->pid);
-        seq_printf(m, "COMM: %s\n", info->comm);
-        seq_printf(m, "START_TIME: %llu\n", info->start_time_ns);
-        seq_printf(m, "PGD_BASE: %p\n", info->pgd_base);
+        seq_printf(m, "Start time (s): %llu\n", info->start_time_ns / 1000000000
+        seq_printf(m, "PGD base address: %p\n", info->pgd_base);
         seq_printf(m, "CODE: %lx-%lx\n", info->code.vm_start, info->code.vm_end);
         seq_printf(m, "DATA: %lx-%lx\n", info->data.vm_start, info->data.vm_end);
         seq_printf(m, "HEAP: %lx-%lx\n", info->heap.vm_start, info->heap.vm_end);
