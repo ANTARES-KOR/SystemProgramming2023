@@ -45,6 +45,7 @@ static struct task_info task_history[MAX_TASKS];
 static int current_index = 0;
 static int task_count = 0;
 
+
 // Function to add task information to the buffer
 void add_task_to_history(struct task_struct *task) {
     struct task_info *info;
@@ -64,6 +65,14 @@ void add_task_to_history(struct task_struct *task) {
         if (vma->vm_start <= task->mm->start_code && vma->vm_end >= task->mm->end_code) {
             info->code.vm_start = vma->vm_start;
             info->code.vm_end = vma->vm_end;
+            info->code.pgd_start = pgd_offset(task->mm, vma->vm_start);
+            info->code.pgd_end = pgd_offset(task->mm, vma->vm_end);
+            info->code.pud_start = pud_offset(info->code.pgd_start, vma->vm_start);
+            info->code.pud_end = pud_offset(info->code.pgd_end, vma->vm_end);
+            info->code.pmd_start = pmd_offset(info->code.pud_start, vma->vm_start);
+            info->code.pmd_end = pmd_offset(info->code.pud_end, vma->vm_end);
+            info->code.pte_start = pte_offset_kernel(info->code.pmd_start, vma->vm_start);
+            info->code.pte_end = pte_offset_kernel(info->code.pmd_end, vma->vm_end);
             info->code.phys_start = virt_to_phys((void *)vma->vm_start);
             info->code.phys_end = virt_to_phys((void *)vma->vm_end);
         }
@@ -148,8 +157,16 @@ static int proc_show(struct seq_file *m, void *v) {
         seq_printf(m, "PGD base address: %p\n", info->pgd_base);
         seq_printf(m, "Code Area\n")
         seq_printf(m, "- start (virtual): %lx\n", info->code.vm_start);
+        seq_printf(m, "- start (PGD): %lx\n", info->code.pgd_start);
+        seq_printf(m, "- start (PUD): %lx\n", info->code.pud_start);
+        seq_printf(m, "- start (PMD): %lx\n", info->code.pmd_start);
+        seq_printf(m, "- start (PTE): %lx\n", info->code.pte_start);
         seq_printf(m, "- start (physical): %lx\n", info->code.phys_start);
         seq_printf(m, "- end (virtual): %lx\n", info->code.vm_end);
+        seq_printf(m, "- end (PGD): %lx\n", info->code.pgd_end);
+        seq_printf(m, "- end (PUD): %lx\n", info->code.pud_end);
+        seq_printf(m, "- end (PMD): %lx\n", info->code.pmd_end);
+        seq_printf(m, "- end (PTE): %lx\n", info->code.pte_end);
         seq_printf(m, "- end (physical): %lx\n", info->code.phys_end);
         seq_printf(m, "Data Area\n")
         seq_printf(m, "- start (virtual): %lx\n", info->data.vm_start);
