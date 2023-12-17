@@ -23,7 +23,20 @@ void my_tasklet_handler(struct tasklet_struct *tsk);
 DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
 
 
-// Structure to hold task information
+/**
+ * @struct task_info
+ * @brief Structure to hold task information
+ * 
+ * This structure is used to store information about a task, including its process ID (pid),
+ * command name (comm), uptime, start time, page global directory (pgd) base, and memory
+ * regions for stack, data, code, and heap.
+ * 
+ * The stack, data, code, and heap regions are represented by their respective start and end
+ * addresses in virtual memory (vm_start and vm_end), page global directory (pgd_start and
+ * pgd_end), page upper directory (pud_start and pud_end), page middle directory (pmd_start
+ * and pmd_end), page table entry (pte_start and pte_end), and physical memory (phys_start
+ * and phys_end).
+ */
 struct task_info {
     pid_t pid;
     char comm[TASK_COMM_LEN];
@@ -46,25 +59,26 @@ static struct task_info task_history[MAX_TASKS];
 static int current_index = 0;
 static int task_count = 0;
 
-// Function to add task information to the buffer
+/**
+ * Adds a task to the task history.
+ * 
+ * @param task The task to be added.
+ */
 void add_task_to_history(struct task_struct *task) {
     struct task_info *info;
     struct vm_area_struct *vma;
 
     if (task == NULL) return;
 
+    // Get the task information
     info = &task_history[current_index];
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
-    // change nanoseconds to seconds
     info->start_time = task->start_time / 1000000000;
-    // get current process's uptime
     info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
-
     info->pgd_base = task->mm->pgd;
 
-    long unsigned mm_index = 0;
-
+    // Get code segment information
     info->code.vm_start = task->mm->start_code;
     info->code.vm_end = task->mm->end_code;
     info->code.pgd_start = pgd_offset(task->mm, info->code.vm_start);
@@ -78,6 +92,7 @@ void add_task_to_history(struct task_struct *task) {
     info->code.phys_start = virt_to_phys((void *)info->code.vm_start);
     info->code.phys_end = virt_to_phys((void *)info->code.vm_end);
 
+    // Get data segment information
     info->data.vm_start = task->mm->start_data;
     info->data.vm_end = task->mm->end_data;
     info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
@@ -91,7 +106,7 @@ void add_task_to_history(struct task_struct *task) {
     info->data.phys_start = virt_to_phys((void *)info->data.vm_start);
     info->data.phys_end = virt_to_phys((void *)info->data.vm_end);
 
-
+    // Get heap segment information
     info->heap.vm_start = task->mm->start_brk;
     info->heap.vm_end = task->mm->brk;
     info->heap.pgd_start = pgd_offset(task->mm, info->heap.vm_start);
@@ -105,57 +120,83 @@ void add_task_to_history(struct task_struct *task) {
     info->heap.phys_start = virt_to_phys((void *)info->heap.vm_start);
     info->heap.phys_end = virt_to_phys((void *)info->heap.vm_end);
 
+    // Get stack segment information
+
+    // Declare a variable to keep track of the index in the mm_mt structure
+    long unsigned mm_index = 0;
+    // Acquire a read lock on the mmap_lock of the task's mm (memory descriptor)
     down_read(&task->mm->mmap_lock);
+    // Iterate over each VMA (Virtual Memory Area) in the mm_mt structure of the task's mm
     mt_for_each(&task->mm->mm_mt, vma, mm_index, ULONG_MAX) {
-        if(vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack){
+        // Check if the VMA contains the start of the stack
+        if (vma->vm_start <= task->mm->start_stack && vma->vm_end >= task->mm->start_stack) {
+            // Store the stack segment information in the task_info structure
+            // Set the start and end addresses of the stack segment
             info->stack.vm_start = task->mm->start_stack;
             info->stack.vm_end = vma->vm_end;
+            // Calculate the page global directory (pgd) offsets for the stack segment
             info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
             info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
+            // Calculate the page upper directory (pud) offsets for the stack segment
             info->stack.pud_start = pud_offset(p4d_offset(info->stack.pgd_start, info->stack.vm_start), info->stack.vm_start);
             info->stack.pud_end = pud_offset(p4d_offset(info->stack.pgd_end, info->stack.vm_end), info->stack.vm_end);
+            // Calculate the page middle directory (pmd) offsets for the stack segment
             info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
             info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
+            // Calculate the page table entry (pte) offsets for the stack segment
             info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
             info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, info->stack.vm_end);
+            // Calculate the physical addresses of the start and end of the stack segment
             info->stack.phys_start = virt_to_phys((void *)info->stack.vm_start);
             info->stack.phys_end = virt_to_phys((void *)info->stack.vm_end);
         }
     }
+    // Release the read lock on the mmap_lock of the task's mm
     up_read(&task->mm->mmap_lock);
+
 
     current_index = (current_index + 1) % MAX_TASKS;
     task_count++;
 }
 
-// finds the latest task and adds it to the buffer
+// This function finds the latest task (process) based on their start time and adds it to the task history.
 void find_latest_task(void) {
     struct task_struct *task, *latest_task = NULL;
     unsigned long latest_start_time = 0;
 
+    // Acquire a read lock on the RCU (Read-Copy Update) mechanism to safely iterate over the process list
     rcu_read_lock();
+
+    // Iterate over each process using the for_each_process macro
     for_each_process(task) {
+        // Check if the process has a valid memory descriptor and if its start time is greater than the current latest start time
         if (task->mm != NULL && (task->start_time > latest_start_time)) {
+            // Update the latest task and latest start time
             latest_task = task;
             latest_start_time = task->start_time;
         }
     }
+
+    // Release the read lock on the RCU mechanism
     rcu_read_unlock();
 
+    // If a latest task was found, add it to the task history
     if (latest_task != NULL) {
         add_task_to_history(latest_task);
     }
 }
 
-// timer for periodic execution
-static struct timer_list my_timer;
+// This is a timer callback function that is executed periodically.
 void timer_callback(struct timer_list *timer) {
+    // Schedule the execution of the tasklet
     tasklet_schedule(&my_tasklet);
+    // Modify the timer to trigger again after a specific interval
     mod_timer(timer, jiffies + msecs_to_jiffies(INTERVAL * 1000));
 }
 
-// Tasklet handler function
+// This is the handler function for the tasklet.
 void my_tasklet_handler(struct tasklet_struct *tsk) {
+    // Call the function to find the latest task
     find_latest_task();
 }
 
@@ -246,6 +287,11 @@ static int proc_open(struct inode *inode, struct file *file) {
     return single_open(file, proc_show, NULL);
 }
 
+// This structure defines the operations that are supported by the /proc/hw2 file.
+// The proc_open field is set to sched_info_proc_open.
+// The proc_read field is set to seq_read, which is a function that reads data from a seq_file.
+// The proc_lseek field is set to seq_lseek, which is a function that sets the position of the seq_file.
+// The proc_release field is set to seq_release, which is a function that releases the resources used by the seq_file.
 static const struct proc_ops proc_fops = {
     .proc_open = proc_open,
     .proc_read = seq_read,
@@ -253,6 +299,8 @@ static const struct proc_ops proc_fops = {
     .proc_release = single_release,
 };
 
+// load module
+// This creates /proc/hw2 by calling proc_create.
 static int __init my_module_init(void) {
     proc_create(PROC_NAME, 0, NULL, &proc_fops);
 
@@ -264,6 +312,8 @@ static int __init my_module_init(void) {
     return 0;
 }
 
+// unload module
+// This removes the /proc/hw2 file by calling remove_proc_entry.
 static void __exit my_module_exit(void) {
 
     remove_proc_entry(PROC_NAME, NULL);
