@@ -58,7 +58,9 @@ void add_task_to_history(struct task_struct *task) {
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
     // change nanoseconds to seconds
     info->start_time = task->start_time / 1000000000;
+    // get current process's uptime
     info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
+
     info->pgd_base = task->mm->pgd;
 
     long unsigned mm_index = 0;
