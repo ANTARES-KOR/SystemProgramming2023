@@ -69,7 +69,6 @@ const char *hw1_get_scheduler_type(struct task_struct *task) {
 	} else if(task->sched_class == &dl_sched_class) {
 		return "DL";
 	} else {
-		return "Unknown";
 	}
 }
 

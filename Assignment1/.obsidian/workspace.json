@@ -1,0 +1,179 @@
+{
+  "main": {
+    "id": "75f7bdf87221acce",
+    "type": "split",
+    "children": [
+      {
+        "id": "75a6c8623f6740b8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "af0d8367da64a085",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "report/pre/Assignment 1 사전 조사 보고서.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "e4c47fd2c71819f6",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.4.16"
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "44ae8e7c567b09bd",
+    "type": "split",
+    "children": [
+      {
+        "id": "858d54abdc697c82",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "c66a38f6cefe01fb",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "b737da0f92144ecb",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "7f36345837bd7d26",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "842822615a5178d1",
+    "type": "split",
+    "children": [
+      {
+        "id": "13f992ddcce8dbfe",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "67555ce2b609abb8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "report/pre/Assignment 1 사전 조사 보고서.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "17ff37714d8e1e2d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "report/pre/Assignment 1 사전 조사 보고서.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "830e222ee3d0be00",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "1bca01fd06cf9afd",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "report/pre/Assignment 1 사전 조사 보고서.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "e4c47fd2c71819f6",
+  "lastOpenFiles": [
+    "hw1_2017147581.tar.bz2",
+    "hw1_2017147581/kernel/linux-image-2017147581.deb",
+    "hw1_2017147581/kernel/linux-headers-2017147581.deb",
+    "hw1_2017147581/module/Makefile",
+    "hw1_2017147581/module/hw1.c",
+    "code 2/module/Makefile",
+    "code 2/module",
+    "hw1_2017147581/kernel/sched.h",
+    "hw1_2017147581/kernel/core.c",
+    "code 2/kernel/sched.h",
+    "code 2/kernel",
+    "report/pre/Assignment 1 사전 조사 보고서.md",
+    "report/practice/Assignment 1 실습 과제 보고서.md",
+    "report/practice/images/result_1.png",
+    "report/practice/images/hw1_module.png",
+    "report/practice/images/proc_cpuinfo.png"
+  ]
+}
