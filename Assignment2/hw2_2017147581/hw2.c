@@ -299,6 +299,9 @@ static const struct proc_ops proc_fops = {
     .proc_release = single_release,
 };
 
+
+static struct timer_list my_timer;
+
 // load module
 // This creates /proc/hw2 by calling proc_create.
 static int __init my_module_init(void) {
