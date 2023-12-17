@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Hyeokjun, Seo");
 MODULE_DESCRIPTION("A module that tracks the most recently started non-kernel task.");
 
-#define INTERVAL 5
+#define INTERVAL 10
 
 void my_tasklet_handler(struct tasklet_struct *tsk);
 DECLARE_TASKLET(my_tasklet, my_tasklet_handler);
