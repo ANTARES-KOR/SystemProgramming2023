@@ -56,7 +56,8 @@ void add_task_to_history(struct task_struct *task) {
     info = &task_history[current_index];
     info->pid = task->pid;
     strncpy(info->comm, task->comm, TASK_COMM_LEN);
-    info->start_time = task->start_time / HZ;
+    // change nanoseconds to seconds
+    info->start_time = task->start_time / 1000000000;
     info->uptime = jiffies_to_msecs(jiffies) / 1000 - info->start_time;
     info->pgd_base = task->mm->pgd;
 
