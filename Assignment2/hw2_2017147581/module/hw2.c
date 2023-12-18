@@ -45,10 +45,10 @@ struct task_info {
     pgd_t *pgd_base;
     struct {
         unsigned long vm_start, vm_end;
-        unsigned long pgd_start, pgd_end;
-        unsigned long pud_start, pud_end;
-        unsigned long pmd_start, pmd_end;
-        unsigned long pte_start, pte_end;
+        pgd_t *pgd_start, *pgd_end;
+        pud_t *pud_start, *pud_end;
+        pmd_t *pmd_start, *pmd_end;
+        pte_t *pte_start, *pte_end;
         unsigned long phys_start, phys_end;
     } code;
 
@@ -207,16 +207,16 @@ static int proc_show(struct seq_file *m, void *v) {
 
         seq_printf(m, "Code Area\n");
         seq_printf(m, "- start (virtual): 0x%lx\n", info->code.vm_start);
-        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->code.pgd_start, pgd_val((pgd_t){info->code.pgd_start}));
-        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->code.pud_start, pud_val((pud_t){info->code.pud_start}));
-        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->code.pmd_start, pmd_val((pmd_t){info->code.pmd_start}));
-        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->code.pte_start, pte_val((pte_t){info->code.pte_start}));
+        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->code.pgd_start, pgd_val(*info->code.pgd_start));
+        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->code.pud_start, pud_val(*info->code.pud_start));
+        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->code.pmd_start, pmd_val(*info->code.pmd_start));
+        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->code.pte_start, pte_val(*info->code.pte_start));
         seq_printf(m, "- start (physical): 0x%lx\n", info->code.phys_start);
         seq_printf(m, "- end (virtual): 0x%lx\n", info->code.vm_end);
-        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->code.pgd_end, pgd_val((pgd_t){info->code.pgd_end}));
-        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->code.pud_end, pud_val((pud_t){info->code.pud_end}));
-        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->code.pmd_end, pmd_val((pmd_t){info->code.pmd_end}));
-        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->code.pte_end, pte_val((pte_t){info->code.pte_end}));
+        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->code.pgd_end, pgd_val(*info->code.pgd_end));
+        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->code.pud_end, pud_val(*info->code.pud_end));
+        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->code.pmd_end, pmd_val(*info->code.pmd_end));
+        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->code.pte_end, pte_val(*info->code.pte_end));
         seq_printf(m, "- end (physical): 0x%lx\n", info->code.phys_end);
 
         seq_printf(m, "Data Area\n");
