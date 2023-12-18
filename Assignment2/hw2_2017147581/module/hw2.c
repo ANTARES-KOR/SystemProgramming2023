@@ -50,7 +50,12 @@ struct task_info {
         unsigned long pmd_start, pmd_end;
         unsigned long pte_start, pte_end;
         unsigned long phys_start, phys_end;
-    } stack, data, code, heap;
+    } stack;
+
+    struct {
+        unsigned long vm_start, vm_end;
+        unsigned long phys_start, phys_end;
+    } data, code, heap;
 };
 
 // Circular buffer for storing task information
@@ -81,47 +86,36 @@ void add_task_to_history(struct task_struct *task) {
     // Get code segment information
     info->code.vm_start = task->mm->start_code;
     info->code.vm_end = task->mm->end_code;
+    // Calculate the page global directory (pgd) offsets for the code segment
     info->code.pgd_start = pgd_offset(task->mm, info->code.vm_start);
     info->code.pgd_end = pgd_offset(task->mm, info->code.vm_end);
+    // Calculate the page upper directory (pud) offsets for the code segment
     info->code.pud_start = pud_offset(p4d_offset(info->code.pgd_start, info->code.vm_start), info->code.vm_start);
     info->code.pud_end = pud_offset(p4d_offset(info->code.pgd_end, info->code.vm_end), info->code.vm_end);
+    // Calculate the page middle directory (pmd) offsets for the code segment
     info->code.pmd_start = pmd_offset(info->code.pud_start, info->code.vm_start);
     info->code.pmd_end = pmd_offset(info->code.pud_end, info->code.vm_end);
+    // Calculate the page table entry (pte) offsets for the code segment
     info->code.pte_start = pte_offset_kernel(info->code.pmd_start, info->code.vm_start);
     info->code.pte_end = pte_offset_kernel(info->code.pmd_end, info->code.vm_end);
+    // Calculate the physical addresses of the start and end of the code segment
     info->code.phys_start = virt_to_phys((void *)info->code.vm_start);
     info->code.phys_end = virt_to_phys((void *)info->code.vm_end);
 
     // Get data segment information
     info->data.vm_start = task->mm->start_data;
     info->data.vm_end = task->mm->end_data;
-    info->data.pgd_start = pgd_offset(task->mm, info->data.vm_start);
-    info->data.pgd_end = pgd_offset(task->mm, info->data.vm_end);
-    info->data.pud_start = pud_offset(p4d_offset(info->data.pgd_start, info->data.vm_start), info->data.vm_start);
-    info->data.pud_end = pud_offset(p4d_offset(info->data.pgd_end, info->data.vm_end), info->data.vm_end);
-    info->data.pmd_start = pmd_offset(info->data.pud_start, info->data.vm_start);
-    info->data.pmd_end = pmd_offset(info->data.pud_end, info->data.vm_end);
-    info->data.pte_start = pte_offset_kernel(info->data.pmd_start, info->data.vm_start);
-    info->data.pte_end = pte_offset_kernel(info->data.pmd_end, info->data.vm_end);
     info->data.phys_start = virt_to_phys((void *)info->data.vm_start);
     info->data.phys_end = virt_to_phys((void *)info->data.vm_end);
 
     // Get heap segment information
     info->heap.vm_start = task->mm->start_brk;
     info->heap.vm_end = task->mm->brk;
-    info->heap.pgd_start = pgd_offset(task->mm, info->heap.vm_start);
-    info->heap.pgd_end = pgd_offset(task->mm, info->heap.vm_end);
-    info->heap.pud_start = pud_offset(p4d_offset(info->heap.pgd_start, info->heap.vm_start), info->heap.vm_start);
-    info->heap.pud_end = pud_offset(p4d_offset(info->heap.pgd_end, info->heap.vm_end), info->heap.vm_end);
-    info->heap.pmd_start = pmd_offset(info->heap.pud_start, info->heap.vm_start);
-    info->heap.pmd_end = pmd_offset(info->heap.pud_end, info->heap.vm_end);
-    info->heap.pte_start = pte_offset_kernel(info->heap.pmd_start, info->heap.vm_start);
-    info->heap.pte_end = pte_offset_kernel(info->heap.pmd_end, info->heap.vm_end);
     info->heap.phys_start = virt_to_phys((void *)info->heap.vm_start);
     info->heap.phys_end = virt_to_phys((void *)info->heap.vm_end);
 
-    // Get stack segment information
 
+    // Get stack segment information
     // Declare a variable to keep track of the index in the mm_mt structure
     long unsigned mm_index = 0;
     // Acquire a read lock on the mmap_lock of the task's mm (memory descriptor)
@@ -134,26 +128,12 @@ void add_task_to_history(struct task_struct *task) {
             // Set the start and end addresses of the stack segment
             info->stack.vm_start = task->mm->start_stack;
             info->stack.vm_end = vma->vm_end;
-            // Calculate the page global directory (pgd) offsets for the stack segment
-            info->stack.pgd_start = pgd_offset(task->mm, info->stack.vm_start);
-            info->stack.pgd_end = pgd_offset(task->mm, info->stack.vm_end);
-            // Calculate the page upper directory (pud) offsets for the stack segment
-            info->stack.pud_start = pud_offset(p4d_offset(info->stack.pgd_start, info->stack.vm_start), info->stack.vm_start);
-            info->stack.pud_end = pud_offset(p4d_offset(info->stack.pgd_end, info->stack.vm_end), info->stack.vm_end);
-            // Calculate the page middle directory (pmd) offsets for the stack segment
-            info->stack.pmd_start = pmd_offset(info->stack.pud_start, info->stack.vm_start);
-            info->stack.pmd_end = pmd_offset(info->stack.pud_end, info->stack.vm_end);
-            // Calculate the page table entry (pte) offsets for the stack segment
-            info->stack.pte_start = pte_offset_kernel(info->stack.pmd_start, info->stack.vm_start);
-            info->stack.pte_end = pte_offset_kernel(info->stack.pmd_end, info->stack.vm_end);
-            // Calculate the physical addresses of the start and end of the stack segment
             info->stack.phys_start = virt_to_phys((void *)info->stack.vm_start);
             info->stack.phys_end = virt_to_phys((void *)info->stack.vm_end);
         }
     }
     // Release the read lock on the mmap_lock of the task's mm
     up_read(&task->mm->mmap_lock);
-
 
     current_index = (current_index + 1) % MAX_TASKS;
     task_count++;
@@ -241,44 +221,20 @@ static int proc_show(struct seq_file *m, void *v) {
 
         seq_printf(m, "Data Area\n");
         seq_printf(m, "- start (virtual): 0x%lx\n", info->data.vm_start);
-        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->data.pgd_start, pgd_val((pgd_t){info->data.pgd_start}));
-        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->data.pud_start, pud_val((pud_t){info->data.pud_start}));
-        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->data.pmd_start, pmd_val((pmd_t){info->data.pmd_start}));
-        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->data.pte_start, pte_val((pte_t){info->data.pte_start}));
         seq_printf(m, "- start (physical): 0x%lx\n", info->data.phys_start);
         seq_printf(m, "- end (virtual): 0x%lx\n", info->data.vm_end);
-        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->data.pgd_end, pgd_val((pgd_t){info->data.pgd_end}));
-        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->data.pud_end, pud_val((pud_t){info->data.pud_end}));
-        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->data.pmd_end, pmd_val((pmd_t){info->data.pmd_end}));
-        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->data.pte_end, pte_val((pte_t){info->data.pte_end}));
         seq_printf(m, "- end (physical): 0x%lx\n", info->data.phys_end);
 
         seq_printf(m, "Heap Area\n");
         seq_printf(m, "- start (virtual): 0x%lx\n", info->heap.vm_start);
-        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->heap.pgd_start, pgd_val((pgd_t){info->heap.pgd_start}));
-        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->heap.pud_start, pud_val((pud_t){info->heap.pud_start}));
-        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->heap.pmd_start, pmd_val((pmd_t){info->heap.pmd_start}));
-        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->heap.pte_start, pte_val((pte_t){info->heap.pte_start}));
         seq_printf(m, "- start (physical): 0x%lx\n", info->heap.phys_start);
         seq_printf(m, "- end (virtual): 0x%lx\n", info->heap.vm_end);
-        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->heap.pgd_end, pgd_val((pgd_t){info->heap.pgd_end}));
-        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->heap.pud_end, pud_val((pud_t){info->heap.pud_end}));
-        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->heap.pmd_end, pmd_val((pmd_t){info->heap.pmd_end}));
-        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->heap.pte_end, pte_val((pte_t){info->heap.pte_end}));
         seq_printf(m, "- end (physical): 0x%lx\n", info->heap.phys_end);
 
         seq_printf(m, "Stack Area\n");
         seq_printf(m, "- start (virtual): 0x%lx\n", info->stack.vm_start);
-        seq_printf(m, "- start (PGD): 0x%lx, 0x%lx\n", info->stack.pgd_start, pgd_val((pgd_t){info->stack.pgd_start}));
-        seq_printf(m, "- start (PUD): 0x%lx, 0x%lx\n", info->stack.pud_start, pud_val((pud_t){info->stack.pud_start}));
-        seq_printf(m, "- start (PMD): 0x%lx, 0x%lx\n", info->stack.pmd_start, pmd_val((pmd_t){info->stack.pmd_start}));
-        seq_printf(m, "- start (PTE): 0x%lx, 0x%lx\n", info->stack.pte_start, pte_val((pte_t){info->stack.pte_start}));
         seq_printf(m, "- start (physical): 0x%lx\n", info->stack.phys_start);
         seq_printf(m, "- end (virtual): 0x%lx\n", info->stack.vm_end);
-        seq_printf(m, "- end (PGD): 0x%lx, 0x%lx\n", info->stack.pgd_end, pgd_val((pgd_t){info->stack.pgd_end}));
-        seq_printf(m, "- end (PUD): 0x%lx, 0x%lx\n", info->stack.pud_end, pud_val((pud_t){info->stack.pud_end}));
-        seq_printf(m, "- end (PMD): 0x%lx, 0x%lx\n", info->stack.pmd_end, pmd_val((pmd_t){info->stack.pmd_end}));
-        seq_printf(m, "- end (PTE): 0x%lx, 0x%lx\n", info->stack.pte_end, pte_val((pte_t){info->stack.pte_end}));
         seq_printf(m, "- end (physical): 0x%lx\n", info->stack.phys_end);
 
         seq_printf(m, "--------------------------------------------------\n");
