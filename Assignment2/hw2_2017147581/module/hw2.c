@@ -50,12 +50,12 @@ struct task_info {
         unsigned long pmd_start, pmd_end;
         unsigned long pte_start, pte_end;
         unsigned long phys_start, phys_end;
-    } stack;
+    } code;
 
     struct {
         unsigned long vm_start, vm_end;
         unsigned long phys_start, phys_end;
-    } data, code, heap;
+    } data, stack, heap;
 };
 
 // Circular buffer for storing task information
